@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show do Milhão: Desafio das Funções</title>
+    <style>
+        :root {
+            --gold: #FFD700;
+            --dark-gold: #D4AF37;
+            --blue: #1E3A8A;
+            --dark-blue: #0F1C4D;
+            --green: #10B981;
+            --light: #f5f5f5;
+            --dark: #212121;
+            --correct: #10B981;
+            --wrong: #EF4444;
+            --help: #3B82F6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-blue), var(--blue));
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .money-decoration {
+            position: absolute;
+            font-size: 3rem;
+            color: var(--gold);
+            opacity: 0.3;
+            z-index: 0;
+            animation: float 6s infinite ease-in-out;
+        }
+        
+        .money-decoration:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .money-decoration:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .money-decoration:nth-child(3) { bottom: 30%; left: 15%; animation-delay: 2s; }
+        .money-decoration:nth-child(4) { bottom: 15%; right: 20%; animation-delay: 3s; }
+        .money-decoration:nth-child(5) { top: 40%; left: 20%; animation-delay: 4s; }
+        .money-decoration:nth-child(6) { top: 60%; right: 15%; animation-delay: 5s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--gold);
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, var(--gold), #FFFFFF, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-weight: bold;
+        }
+        
+        .question-container {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            text-align: center;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--blue);
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--blue);
+        }
+        
+        .option:hover {
+            background: var(--gold);
+            color: var(--dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .option.eliminated {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: scale(0.95);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background: var(--gold);
+            color: var(--dark-blue);
+            border: 2px solid var(--dark-gold);
+        }
+        
+        .btn-primary:hover {
+            background: var(--dark-gold);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-danger {
+            background: var(--wrong);
+            color: white;
+            width: 100%;
+            border: 2px solid #DC2626;
+        }
+        
+        .btn-danger:hover {
+            background: #DC2626;
+            transform: translateY(-3px);
+        }
+        
+        .btn-start {
+            background: linear-gradient(45deg, var(--green), #34D399);
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px 40px;
+            margin: 20px 0;
+            border: 2px solid #059669;
+        }
+        
+        .btn-start:hover {
+            background: linear-gradient(45deg, #059669, #10B981);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .lifelines {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .lifeline {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid var(--gold);
+        }
+        
+        .lifeline:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+        
+        .lifeline-count {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: var(--gold);
+        }
+        
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .disabled:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+        
+        .welcome-screen {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .welcome-screen h2 {
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .welcome-screen p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+            border: 1px solid var(--gold);
+        }
+        
+        .instructions h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .instructions li:before {
+            content: "•";
+            color: var(--gold);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            color: var(--dark);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+        
+        .modal h2 {
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+        
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .game-screen {
+            display: none;
+        }
+        
+        /* Estilos para o resultado inline */
+        .result-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: var(--dark);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 90%;
+            width: 500px;
+            text-align: center;
+            border: 3px solid var(--gold);
+        }
+        
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .result-message {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .result-line {
+            margin: 8px 0;
+            text-align: left;
+            padding-left: 10px;
+        }
+        
+        .result-correct {
+            color: var(--correct);
+        }
+        
+        .result-wrong {
+            color: var(--wrong);
+        }
+        
+        .result-info {
+            color: var(--blue);
+        }
+        
+        .money-prize {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .lifelines {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .result-container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .money-decoration {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Decoração com cifrões -->
+    <div class="money-decoration">$</div>
+    <div class="money-decoration">$</div>
+    <div class="money-decoration">$</div>
+    <div class="money-decoration">$</div>
+    <div class="money-decoration">$</div>
+    <div class="money-decoration">$</div>
+    
+    <div class="container">
+        <!-- Tela de Início -->
+        <div class="welcome-screen" id="welcome-screen">
+            <header>
+                <h1>Show do Milhão</h1>
+                <div class="subtitle">Desafio das Funções</div>
+            </header>
+            
+            <div class="instructions">
+                <h3>Como Jogar:</h3>
+                <ul>
+                    <li>Você responderá 12 questões sobre funções em ordem fixa</li>
+                    <li>Cada resposta correta aumenta seu prêmio</li>
+                    <li>Use as ajudas estrategicamente:</li>
+                    <ul>
+                        <li><strong>Pular</strong>: Pula a pergunta atual (2 usos)</li>
+                        <li><strong>Consultar Caderno</strong>: Mostra uma dica (3 usos)</li>
+                        <li><strong>Professor Ajuda</strong>: Explica como resolver (1 uso)</li>
+                        <li><strong>Eliminar Alternativas</strong>: Remove 1 ou 2 opções erradas (3 usos)</li>
+                    </ul>
+                    <li><strong>Atenção:</strong> As ajudas têm limites de uso!</li>
+                </ul>
+            </div>
+            
+            <button class="btn btn-start" onclick="startGame()">Iniciar Jogo</button>
+        </div>
+        
+        <!-- Tela do Jogo -->
+        <div class="game-screen" id="game-screen">
+            <header>
+                <h1>Show do Milhão</h1>
+                <div class="subtitle">Desafio das Funções</div>
+            </header>
+            
+            <div class="score-board">
+                <div>Questão: <span id="question-number">1</span>/12</div>
+                <div>Prêmio: <span class="money-prize">R$ <span id="current-prize">1.000</span></span></div>
+            </div>
+            
+            <div class="question-container">
+                <div id="question">Carregando pergunta...</div>
+            </div>
+            
+            <div class="options-container">
+                <div class="option" onclick="checkAnswer(0)">A) <span id="option0"></span></div>
+                <div class="option" onclick="checkAnswer(1)">B) <span id="option1"></span></div>
+                <div class="option" onclick="checkAnswer(2)">C) <span id="option2"></span></div>
+                <div class="option" onclick="checkAnswer(3)">D) <span id="option3"></span></div>
+            </div>
+            
+            <div class="lifelines">
+                <div class="lifeline" onclick="useLifeline('skip')">
+                    <div>Pular</div>
+                    <div class="lifeline-count" id="skip-count">2/2</div>
+                </div>
+                <div class="lifeline" onclick="useLifeline('notebook')">
+                    <div>Consultar Caderno</div>
+                    <div class="lifeline-count" id="notebook-count">3/3</div>
+                </div>
+                <div class="lifeline" onclick="useLifeline('teacher')">
+                    <div>Professor Ajuda</div>
+                    <div class="lifeline-count" id="teacher-count">1/1</div>
+                </div>
+                <div class="lifeline" onclick="useLifeline('eliminate')">
+                    <div>Eliminar Alternativas</div>
+                    <div class="lifeline-count" id="eliminate-count">3/3</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-danger" onclick="surrender()">Desistir do Jogo</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="notebook-modal">
+        <div class="modal-content">
+            <h2>Consultando o Caderno...</h2>
+            <div id="notebook-content">
+                <p id="notebook-tip">Carregando dica...</p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('notebook-modal')">Fechar</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="teacher-modal">
+        <div class="modal-content">
+            <h2>Professor Ajuda</h2>
+            <div id="teacher-content">
+                <p id="teacher-explanation">Carregando explicação...</p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('teacher-modal')">Fechar</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <h2 id="result-title">Resultado</h2>
+            <p id="result-message"></p>
+            <button class="btn btn-primary" id="result-button" onclick="closeModal('result-modal')">Continuar</button>
+        </div>
+    </div>
+
+    <!-- Container para resultado inline -->
+    <div class="result-container" id="inline-result" style="display: none;">
+        <div class="result-title" id="inline-result-title"></div>
+        <div class="result-message" id="inline-result-message"></div>
+        <button class="btn btn-primary" id="inline-result-button">Continuar</button>
+    </div>
+
+    <script>
+        // Variáveis do jogo
+        let currentQuestion = 0;
+        let score = 0;
+        let usedSkips = 0;
+        let maxSkips = 2;
+        let usedNotebook = 0;
+        let maxNotebook = 3;
+        let usedTeacher = 0;
+        let maxTeacher = 1;
+        let usedEliminate = 0;
+        let maxEliminate = 3;
+        let questions = [];
+        let eliminatedOptions = [];
+        
+        // Premiação (12 questões)
+        const prizes = [
+            100, 200, 300, 500, 700, 1000, 1500, 2500, 5000, 10000, 25000, 50000
+        ];
+        
+        // Dicas para o caderno
+        const notebookTips = [
+            "Uma função é uma relação entre dois conjuntos onde cada elemento do primeiro conjunto está associado a um único elemento do segundo.",
+            "O domínio de uma função é o conjunto de todos os valores de entrada possíveis.",
+            "O contradomínio é o conjunto que contém todos os possíveis valores de saída.",
+            "A imagem é o conjunto de valores de saída que realmente são produzidos pela função.",
+            "Uma função f: A → B é injetora se elementos diferentes de A têm imagens diferentes em B.",
+            "Uma função f: A → B é sobrejetora se todo elemento de B é imagem de pelo menos um elemento de A.",
+            "Uma função é bijetora se é ao mesmo tempo injetora e sobrejetora.",
+            "A função afim tem a forma f(x) = ax + b, onde a e b são constantes reais.",
+            "A função linear é um caso especial da função afim onde b = 0: f(x) = ax.",
+            "A função constante tem a forma f(x) = k, onde k é um número real fixo.",
+            "A função identidade é f(x) = x, onde cada elemento é mapeado para si mesmo.",
+            "Para determinar o domínio de uma função com raiz quadrada, o radicando deve ser ≥ 0.",
+            "Para determinar o domínio de uma função racional, o denominador deve ser diferente de zero.",
+            "O coeficiente angular (a) na função afim f(x) = ax + b indica a inclinação da reta.",
+            "O coeficiente linear (b) na função afim f(x) = ax + b indica onde a reta corta o eixo y.",
+            "Para encontrar a raiz de uma função, resolva a equação f(x) = 0.",
+            "O gráfico de uma função constante é uma reta horizontal.",
+            "O gráfico de uma função linear passa pela origem (0,0).",
+            "O gráfico de uma função afim é uma reta que pode interceptar ambos os eixos.",
+            "Para verificar se uma relação é função, cada elemento do domínio deve ter uma única imagem."
+        ];
+        
+        // Banco de questões sobre funções (12 questões em ordem fixa)
+        const questionBank = [
+            {
+                question: "Qual destas relações NÃO representa uma função?",
+                options: [
+                    "{(1,2), (2,3), (3,4)}",
+                    "{(1,2), (2,2), (3,2)}",
+                    "{(1,2), (1,3), (2,4)}",
+                    "{(0,1), (1,1), (2,1)}"
+                ],
+                answer: 2,
+                explanation: "No item c, o elemento 1 do domínio está associado a dois valores diferentes no contradomínio (2 e 3), o que viola a definição de função.",
+                tipIndex: 0
+            },
+            {
+                question: "A função f(x) = 5 é classificada como:",
+                options: [
+                    "Função linear",
+                    "Função afim",
+                    "Função constante",
+                    "Função identidade"
+                ],
+                answer: 2,
+                explanation: "Para todo x, f(x) = 5 (valor constante), portanto é uma função constante.",
+                tipIndex: 9
+            },
+            {
+                question: "Qual é o coeficiente angular da função f(x) = 2x - 1?",
+                options: [
+                    "2",
+                    "-1",
+                    "1",
+                    "0"
+                ],
+                answer: 0,
+                explanation: "Na forma f(x) = ax + b, 'a' é o coeficiente angular. Neste caso, a = 2.",
+                tipIndex: 13
+            },
+            {
+                question: "Dada f(x) = 3x + 2, qual é o valor de f(4)?",
+                options: [
+                    "12",
+                    "14",
+                    "10",
+                    "18"
+                ],
+                answer: 1,
+                explanation: "f(4) = 3×4 + 2 = 12 + 2 = 14.",
+                tipIndex: 7
+            },
+            {
+                question: "A função f(x) = x é conhecida como:",
+                options: [
+                    "Função constante",
+                    "Função linear",
+                    "Função identidade",
+                    "Função quadrática"
+                ],
+                answer: 2,
+                explanation: "f(x) = x associa cada elemento a si mesmo, portanto é a função identidade.",
+                tipIndex: 10
+            },
+            {
+                question: "Para qual valor de x temos f(x) = 0 na função f(x) = 2x - 8?",
+                options: [
+                    "2",
+                    "4",
+                    "6",
+                    "8"
+                ],
+                answer: 1,
+                explanation: "2x - 8 = 0 ⇒ 2x = 8 ⇒ x = 4.",
+                tipIndex: 15
+            },
+            {
+                question: "A função f(x) = -3x + 6 é classificada como:",
+                options: [
+                    "Função constante",
+                    "Função identidade",
+                    "Função linear",
+                    "Função quadrática"
+                ],
+                answer: 2,
+                explanation: "É do tipo f(x) = ax + b, portanto é uma função linear (caso especial da função afim).",
+                tipIndex: 8
+            },
+            {
+                question: "Dada f(x) = 2x - 4, em que ponto o gráfico corta o eixo y?",
+                options: [
+                    "(0, -4)",
+                    "(0, 4)",
+                    "(2, 0)",
+                    "(-4, 0)"
+                ],
+                answer: 0,
+                explanation: "Corta o eixo y quando x = 0 ⇒ f(0) = 2×0 - 4 = -4. Portanto, no ponto (0, -4).",
+                tipIndex: 14
+            },
+            {
+                question: "Qual é o domínio da função f(x) = 1/(x-2)?",
+                options: [
+                    "ℝ - {2}",
+                    "ℝ - {-2}",
+                    "x > 2",
+                    "x < 2"
+                ],
+                answer: 0,
+                explanation: "O denominador não pode ser zero, então x - 2 ≠ 0 ⇒ x ≠ 2. Portanto, o domínio é ℝ - {2}.",
+                tipIndex: 12
+            },
+            {
+                question: "Se f(x) = 3x - 1 e g(x) = x + 2, qual é f(g(3))?",
+                options: [
+                    "8",
+                    "11",
+                    "14",
+                    "17"
+                ],
+                answer: 2,
+                explanation: "g(3) = 3 + 2 = 5, f(5) = 3×5 - 1 = 15 - 1 = 14.",
+                tipIndex: 0
+            },
+            {
+                question: "Qual é o coeficiente linear da função f(x) = -2x + 7?",
+                options: [
+                    "-2",
+                    "2",
+                    "7",
+                    "-7"
+                ],
+                answer: 2,
+                explanation: "Na forma f(x) = ax + b, 'b' é o coeficiente linear. Neste caso, b = 7.",
+                tipIndex: 14
+            },
+            {
+                question: "Qual é a raiz da função f(x) = -5x + 20?",
+                options: [
+                    "2",
+                    "4",
+                    "5",
+                    "10"
+                ],
+                answer: 1,
+                explanation: "-5x + 20 = 0 ⇒ -5x = -20 ⇒ x = 4.",
+                tipIndex: 15
+            }
+        ];
+        
+        // Inicializar o jogo
+        function initGame() {
+            // Usa as questões na ordem fixa, sem embaralhar
+            questions = [...questionBank];
+            
+            currentQuestion = 0;
+            score = 0;
+            usedSkips = 0;
+            usedNotebook = 0;
+            usedTeacher = 0;
+            usedEliminate = 0;
+            eliminatedOptions = [];
+            
+            updateLifelinesDisplay();
+            updateScore();
+            loadQuestion();
+        }
+        
+        function startGame() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            initGame();
+        }
+        
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                endGame(true);
+                return;
+            }
+            
+            const question = questions[currentQuestion];
+            document.getElementById('question').textContent = question.question;
+            
+            eliminatedOptions = [];
+            
+            for (let i = 0; i < 4; i++) {
+                const optionElement = document.getElementById(`option${i}`);
+                optionElement.textContent = question.options[i];
+                optionElement.parentElement.classList.remove('eliminated');
+            }
+            
+            document.getElementById('question-number').textContent = currentQuestion + 1;
+            updateScore();
+            updateLifelinesDisplay();
+        }
+        
+        function updateLifelinesDisplay() {
+            document.getElementById('skip-count').textContent = `${maxSkips - usedSkips}/${maxSkips}`;
+            document.getElementById('notebook-count').textContent = `${maxNotebook - usedNotebook}/${maxNotebook}`;
+            document.getElementById('teacher-count').textContent = `${maxTeacher - usedTeacher}/${maxTeacher}`;
+            document.getElementById('eliminate-count').textContent = `${maxEliminate - usedEliminate}/${maxEliminate}`;
+            
+            document.querySelector('[onclick="useLifeline(\'skip\')"]').className = 
+                usedSkips >= maxSkips ? 'lifeline disabled' : 'lifeline';
+            document.querySelector('[onclick="useLifeline(\'notebook\')"]').className = 
+                usedNotebook >= maxNotebook ? 'lifeline disabled' : 'lifeline';
+            document.querySelector('[onclick="useLifeline(\'teacher\')"]').className = 
+                usedTeacher >= maxTeacher ? 'lifeline disabled' : 'lifeline';
+            document.querySelector('[onclick="useLifeline(\'eliminate\')"]').className = 
+                usedEliminate >= maxEliminate ? 'lifeline disabled' : 'lifeline';
+        }
+        
+        function checkAnswer(selectedOption) {
+            if (eliminatedOptions.includes(selectedOption)) {
+                alert("Esta alternativa foi eliminada! Escolha outra.");
+                return;
+            }
+            
+            const correctAnswer = questions[currentQuestion].answer;
+            const selectedText = `${String.fromCharCode(65 + selectedOption)}) ${questions[currentQuestion].options[selectedOption]}`;
+            const correctText = `${String.fromCharCode(65 + correctAnswer)}) ${questions[currentQuestion].options[correctAnswer]}`;
+            
+            if (selectedOption === correctAnswer) {
+                score = prizes[currentQuestion];
+                currentQuestion++;
+                
+                if (currentQuestion >= questions.length) {
+                    endGame(true);
+                } else {
+                    showDetailedResult(true, selectedText, correctText, questions[currentQuestion-1].explanation);
+                }
+            } else {
+                showDetailedResult(false, selectedText, correctText, questions[currentQuestion].explanation);
+            }
+        }
+        
+        function showDetailedResult(isCorrect, selectedText, correctText, explanation) {
+            const inlineResult = document.getElementById('inline-result');
+            const inlineResultTitle = document.getElementById('inline-result-title');
+            const inlineResultMessage = document.getElementById('inline-result-message');
+            const inlineResultButton = document.getElementById('inline-result-button');
+            
+            inlineResultTitle.textContent = isCorrect ? "Correto! ✓" : "Incorreto! ✗";
+            inlineResultTitle.className = isCorrect ? 'result-title result-correct' : 'result-title result-wrong';
+            
+            let formattedMessage = `
+                <div class="result-line">${selectedText}</div>
+                <div class="result-line result-correct">${correctText}</div>
+                <div class="result-line result-info">${explanation}</div>
+            `;
+            
+            inlineResultMessage.innerHTML = formattedMessage;
+            
+            if (isCorrect) {
+                inlineResultButton.textContent = currentQuestion >= questions.length ? "Ver Resultado Final" : "Próxima Pergunta";
+                inlineResultButton.onclick = function() {
+                    inlineResult.style.display = 'none';
+                    if (currentQuestion >= questions.length) {
+                        endGame(true);
+                    } else {
+                        loadQuestion();
+                    }
+                };
+            } else {
+                inlineResultButton.textContent = "Fim de Jogo";
+                inlineResultButton.onclick = function() {
+                    inlineResult.style.display = 'none';
+                    endGame(false);
+                };
+            }
+            
+            inlineResult.style.display = 'block';
+        }
+        
+        function useLifeline(type) {
+            switch(type) {
+                case 'skip':
+                    if (usedSkips >= maxSkips) {
+                        alert("Você já usou todos os pulos disponíveis!");
+                        return;
+                    }
+                    usedSkips++;
+                    break;
+                case 'notebook':
+                    if (usedNotebook >= maxNotebook) {
+                        alert("Você já usou todas as consultas ao caderno!");
+                        return;
+                    }
+                    usedNotebook++;
+                    break;
+                case 'teacher':
+                    if (usedTeacher >= maxTeacher) {
+                        alert("Você já usou toda a ajuda do professor!");
+                        return;
+                    }
+                    usedTeacher++;
+                    break;
+                case 'eliminate':
+                    if (usedEliminate >= maxEliminate) {
+                        alert("Você já usou todas as eliminações de alternativas!");
+                        return;
+                    }
+                    usedEliminate++;
+                    break;
+            }
+            
+            switch(type) {
+                case 'skip':
+                    currentQuestion++;
+                    if (currentQuestion >= questions.length) {
+                        endGame(true);
+                    } else {
+                        loadQuestion();
+                    }
+                    break;
+                case 'notebook':
+                    const tipIndex = questions[currentQuestion].tipIndex;
+                    document.getElementById('notebook-tip').textContent = notebookTips[tipIndex];
+                    document.getElementById('notebook-modal').style.display = "flex";
+                    break;
+                case 'teacher':
+                    document.getElementById('teacher-explanation').textContent = 
+                        `Momento do professor ajudar: ${questions[currentQuestion].explanation}`;
+                    document.getElementById('teacher-modal').style.display = "flex";
+                    break;
+                case 'eliminate':
+                    const optionsToEliminate = Math.random() < 0.5 ? 1 : 2;
+                    const correctAnswer = questions[currentQuestion].answer;
+                    let possibleOptions = [0, 1, 2, 3].filter(opt => 
+                        opt !== correctAnswer && !eliminatedOptions.includes(opt));
+                    
+                    // Embaralha apenas as opções possíveis para eliminar
+                    for (let i = possibleOptions.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [possibleOptions[i], possibleOptions[j]] = [possibleOptions[j], possibleOptions[i]];
+                    }
+                    
+                    for (let i = 0; i < Math.min(optionsToEliminate, possibleOptions.length); i++) {
+                        const optionToEliminate = possibleOptions[i];
+                        eliminatedOptions.push(optionToEliminate);
+                        document.getElementById(`option${optionToEliminate}`).parentElement.classList.add('eliminated');
+                    }
+                    break;
+            }
+            
+            updateLifelinesDisplay();
+        }
+        
+        function surrender() {
+            if (confirm("Tem certeza que deseja desistir?")) {
+                endGame(false);
+            }
+        }
+        
+        function endGame(isWin) {
+            let message = isWin ? 
+                `Parabéns! Você ganhou <span class="money-prize">R$ ${score.toLocaleString('pt-BR')}</span>!` : 
+                `Game Over! Você levou para casa <span class="money-prize">R$ ${score.toLocaleString('pt-BR')}</span>.`;
+            
+            document.getElementById('result-title').textContent = isWin ? "Vitória!" : "Fim de Jogo";
+            document.getElementById('result-message').innerHTML = message;
+            document.getElementById('result-button').textContent = "Voltar ao Início";
+            document.getElementById('result-button').onclick = function() {
+                closeModal('result-modal');
+                document.getElementById('game-screen').style.display = 'none';
+                document.getElementById('welcome-screen').style.display = 'block';
+            };
+            
+            document.getElementById('result-modal').style.display = "flex";
+        }
+        
+        function updateScore() {
+            document.getElementById('current-prize').textContent = score.toLocaleString('pt-BR');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+    </script>
+</body>
+</html>
