@@ -452,8 +452,8 @@
                     <li>Cada resposta correta aumenta seu prêmio</li>
                     <li>Use as ajudas estrategicamente:</li>
                     <ul>
-                        <li><strong>Pular</strong>: Pula a pergunta atual (2 usos)</li>
-                        <li><strong>Consultar Caderno</strong>: Mostra uma dica (3 usos)</li>
+                        <li><strong>Pular</strong>: Pula a pergunta atual (1 uso)</li>
+                        <li><strong>Consultar Caderno</strong>: Mostra uma dica (2 usos)</li>
                         <li><strong>Professor Ajuda</strong>: Explica como resolver (1 uso)</li>
                         <li><strong>Eliminar Alternativas</strong>: Remove 1 ou 2 opções erradas (3 usos)</li>
                     </ul>
@@ -490,11 +490,11 @@
             <div class="lifelines">
                 <div class="lifeline" onclick="useLifeline('skip')">
                     <div>Pular</div>
-                    <div class="lifeline-count" id="skip-count">2/2</div>
+                    <div class="lifeline-count" id="skip-count">1/1</div>
                 </div>
                 <div class="lifeline" onclick="useLifeline('notebook')">
                     <div>Consultar Caderno</div>
-                    <div class="lifeline-count" id="notebook-count">3/3</div>
+                    <div class="lifeline-count" id="notebook-count">2/2</div>
                 </div>
                 <div class="lifeline" onclick="useLifeline('teacher')">
                     <div>Professor Ajuda</div>
@@ -552,13 +552,13 @@
         let currentQuestion = 0;
         let score = 0;
         let usedSkips = 0;
-        let maxSkips = 2;
+        let maxSkips = 1; // Alterado para 1
         let usedNotebook = 0;
-        let maxNotebook = 3;
+        let maxNotebook = 2; // Alterado para 2
         let usedTeacher = 0;
-        let maxTeacher = 1;
+        let maxTeacher = 1; // Mantido 1
         let usedEliminate = 0;
-        let maxEliminate = 3;
+        let maxEliminate = 3; // Mantido 3
         let questions = [];
         let eliminatedOptions = [];
         
